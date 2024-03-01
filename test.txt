@@ -1,0 +1,11 @@
+PROGRAM TEST1;
+	BEGIN
+		LOOP
+			FOR VAR1 := VAR2 + 10 TO VAR3 DO
+				LOOP
+					(* asdasda 
+					*)
+				ENDLOOP;
+			ENDFOR;
+		ENDLOOP;
+	END.
