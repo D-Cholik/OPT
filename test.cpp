@@ -12,14 +12,15 @@ vector <string> IdentifierVector;
 
 int main()
 {
-    std::cout << "+-----+------+----------+----------+" << std::endl;
-    std::cout << "|Line |Column|Id        |Lexem     |" << std::endl;
-    std::cout << "+-----+------+----------+----------+" << std::endl;
+    std::cout << setw(25) << "Table 'Lexem'" << std::endl;
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "| Line | Column |    Id    |   Lexem  |" << std::endl;
+    std::cout << "---------------------------------------" << std::endl;
     ifstream f;
     f.open("test.txt");
     if (!f.is_open())
     {
-        cout << "Error: cannot open the file" << endl;
+        std::cout << "Error: cannot open the file" << endl;
     }
     else
     {
@@ -275,12 +276,11 @@ int main()
                         s = f.get();
                         ind = (int)s;
                         column++;
-
                         category = attributes[ind];
 
-                        if (token.lexem.length() == 1 && (category == 0 || category == 1 || category == 2)) {
-                            token.id = 301;
-                            token.text = "Delimiter";
+                        if (category == 0 || category == 1 || category == 2 ) {
+                            token.id = 101;
+                            token.text = "Delimiter1";
                             TokenVector.push_back(token);
                             PrintInfo(token);
                             f.unget();
@@ -288,13 +288,22 @@ int main()
                         else {
                             column++;
                             token.lexem += s;
-                            int isKeyword = IsKeyword(token.lexem);
-                            if (isKeyword != 1) {
-                                token.id = isKeyword;
-                                token.text = "Delimiter2";
-                                TokenVector.push_back(token);
-                                PrintInfo(token);
-                                
+                            int DelimetrTable = SearchDelimetrTable(token.lexem);
+                            if (DelimetrTable != 1) {
+                                if (DelimetrTable == 301)
+                                {
+                                    token.id = DelimetrTable;
+                                    token.text = "Delimiter2";
+                                    TokenVector.push_back(token);
+                                    PrintInfo(token);
+                                }
+                                else
+                                {
+                                    token.id = DelimetrTable;
+                                    token.text = "Delimiter2";
+                                    TokenVector.push_back(token);
+                                    PrintInfo(token);
+                                }
                             }
                             else {
                                 token.text = "invalid multi-character separator";
@@ -303,7 +312,40 @@ int main()
                         }
                         token.lexem = "";
                         continue;
+                    case 43:
+                        token.line = line;
+                        token.column = column;
+                        token.lexem += s;
+                        s = f.get();
+                        ind = (int)s;
+                        column++;
+                        category = attributes[ind];
 
+                        if (category == 0 || category == 1 || category == 2) {
+                            token.id = 102;
+                            token.text = "Delimiter1";
+                            TokenVector.push_back(token);
+                            PrintInfo(token);
+                            f.unget();
+                        }
+                        else {
+                            column++;
+                            token.lexem += s;
+                            int DelimetrTable = SearchDelimetrTable(token.lexem);
+                            if (DelimetrTable != 1) {
+                                token.id = DelimetrTable;
+                                token.text = "Delimiter2";
+                                TokenVector.push_back(token);
+                                PrintInfo(token);
+
+                            }
+                            else {
+                                token.text = "invalid multi-character separator";
+                                ErrorVector.push_back(token);
+                            }
+                        }
+                        token.lexem = "";
+                        continue;
 
                     case 5:
 
@@ -364,13 +406,10 @@ int main()
                             }
                             if (isEndComment)
                             {
-                                //cout << "Comment: " << token.lexem << endl;
                                 token.lexem = "";
                             }
                             else
                             {
-                                //cout << "ERROR Unending Comment: " << token.lexem << endl;
-                                //cout << token.lexem << comment << endl;
                                 for (int i = 0; i < token.lexem.size(); i++)
                                 {
                                     if (token.lexem[i] != '\n')
@@ -445,31 +484,34 @@ int main()
                 }
             }
         }
-
-        cout << "\n" << std::endl;
-        cout << "+-------------+---------------------------------------------+---------------+------------------+" << std::endl;
-        cout << "|Error Type   |                                   Error text|          Lexem|       Line/Column|" << std::endl;
-        cout << "+-------------+---------------------------------------------+---------------+------------------+" << std::endl;
+        std::cout << "---------------------------------------" << std::endl;
+        std::cout << "\n" << std::endl;
+        std::cout << setw(50) << "Table 'Lexer error'" << std::endl;
+        std::cout << "----------------------------------------------------------------------------------------" << std::endl;
+        std::cout << "| Line | Column |  Error Type |                                   Error text|   Lexem  |" << std::endl;
+        std::cout << "----------------------------------------------------------------------------------------" << std::endl;
         for (int i = 0; i < ErrorVector.size(); i++)
         {
             PrintError(ErrorVector[i]);
         }
+        std::cout << "----------------------------------------------------------------------------------------" << std::endl;
+
     }
 }
 
 void PrintInfo(LexemInfo lexemInfo)
 {
-    std::cout << "|" << setw(5) << lexemInfo.line << "|" << setw(6) << lexemInfo.column << "|" << setw(10) << lexemInfo.id << "|" << setw(10) << lexemInfo.lexem << "|" << std::endl;
+    std::cout << "|" << setw(6) << lexemInfo.line << "|" << setw(8) << lexemInfo.column << "|" << setw(10) << lexemInfo.id << "|" << setw(10) << lexemInfo.lexem << "|" << std::endl;
 }
 
 void PrintError(LexemInfo errorInfo)
 {
-    std::cout << "|Lexer error: |" << setw(45) << errorInfo.text << "|" << setw(15) << errorInfo.lexem << "|" << "Line: " << errorInfo.line << " Column: " << errorInfo.column << "|" << std::endl;
+    std::cout << "|" << setw(6) << errorInfo.line << "|" << setw(8) << errorInfo.column << "|Lexer error: |" << setw(45) << errorInfo.text << "|" << setw(10) << errorInfo.lexem << "|"  << std::endl;
 }
 
 int IsKeyword(string keyword)
 {
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 6; i++)
         if (Keywords[i] == keyword)
             return 401 + i;
 
@@ -503,3 +545,11 @@ int SearchIdentifier(string strIdentifier)
     return 1;
 }
 
+int SearchDelimetrTable(string Delimetr)
+{
+    for (int i = 0; i < 6; i++)
+        if (tableDelimetr[i] == Delimetr)
+            return 301 + i;
+
+    return 1;
+}

@@ -1,11 +1,6 @@
-PROGRAM TEST1;
+PROGRAM TEST2	(* QWEW *);
 	BEGIN
-		LOOP
-			FOR VAR1 := VAR2 + 10 TO VAR3 DO
-				LOOP
-					(* asdasda 
-					*)
-				ENDLOOP;
-			ENDFOR;
-		ENDLOOP;
+		 < <> > > ! # . @[]^ :=  
+		 VaR1 := 3
+		 (* asdasd
 	END.

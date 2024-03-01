@@ -21,8 +21,9 @@ int attributes[128] = { 6,6,6,6,6,6,6,6,
                         6,6,6,6,6,6,6,6,    // xyz{|}~⌂
 };
 
-const string Keywords[9] = { "PROGRAM", "BEGIN", "END", "WHILE", "ENDWHILE", "DO", "<>", ">=", "<="};
+const string Keywords[6] = { "PROGRAM", "BEGIN", "END", "WHILE", "ENDWHILE", "DO"};
 const string tableIdentifiers[2] = { "INTEGER", "FLOAT" };
+const string tableDelimetr[3] = { "<=", ">=", "<>" };
 
 
 struct LexemInfo
@@ -40,3 +41,4 @@ int SearchConst(string strConst);
 int SearchIdentifier(string strIdentifier);
 int IsKeyword(string keyword);
 int SearchIdentifierTable(string Identifiers);
+int SearchDelimetrTable(string Delimetr);
