@@ -5,8 +5,8 @@
 #include <format>
 #include "LexemInfo.h"
 
-vector <LexemInfo> ErrorVector;
-vector <LexemInfo> TokenVector;
+vector <Lexem> ErrorVector;
+vector <Lexem> TokenVector;
 vector <string> ConstVector;
 vector <string> IdentifierVector;
 
@@ -24,40 +24,39 @@ int main()
     }
     else
     {
-        int lineStartOfComment = 0, columnStartOfComment = 0;
-        char s;
+        char currentSymbol;
         bool flag = true;
-        int ind;
-        int indSecond;
-        LexemInfo token;
+        int index;
+        Lexem token;
         string comment = "";
         int line = 1, column = 1;
         int category;
+
         while (!f.eof())
         {
             if (flag)
             {
-                s = f.get();
-                ind = (int)s;
+                currentSymbol = f.get();
+                index = (int)currentSymbol;
             }
             else
             {
                 flag = true;
             }
-            if (ind >= 0)
+            if (index >= 0)
             {
-                if (ind <= 127)
+                if (index <= 127)
                 {
-                    category = attributes[ind];
+                    category = attributes[index];
                     switch (category)
                     {
                     case 0:
-                        if (s == '\n')
+                        if (currentSymbol == '\n')
                         {
                             line++;
                             column = 1;
                         }
-                        else if (s == '\t')
+                        else if (currentSymbol == '\t')
                         {
                             column = column - (column - 1) % 4 + 4;
                         }
@@ -73,14 +72,14 @@ int main()
                         token.text = "Number";
                         do
                         {
-                            token.lexem += s;
-                            s = f.get();
-                            ind = (int)s;
-                            if (ind >= 0)
+                            token.lexem += currentSymbol;
+                            currentSymbol = f.get();
+                            index = (int)currentSymbol;
+                            if (index >= 0)
                             {
-                                if (ind <= 127)
+                                if (index <= 127)
                                 {
-                                    category = attributes[ind];
+                                    category = attributes[index];
                                 }
                                 else
                                 {
@@ -89,7 +88,7 @@ int main()
                             }
                             else
                             {
-                                if (ind == -1)
+                                if (index == -1)
                                 {
                                     category = 0;
                                     break;
@@ -129,14 +128,14 @@ int main()
                         {
                             do
                             {
-                                token.lexem += s;
-                                s = f.get();
-                                ind = (int)s;
-                                if (ind >= 0)
+                                token.lexem += currentSymbol;
+                                currentSymbol = f.get();
+                                index = (int)currentSymbol;
+                                if (index >= 0)
                                 {
-                                    if (ind <= 127)
+                                    if (index <= 127)
                                     {
-                                        category = attributes[ind];
+                                        category = attributes[index];
                                     }
                                     else
                                     {
@@ -145,7 +144,7 @@ int main()
                                 }
                                 else
                                 {
-                                    if (ind == -1)
+                                    if (index == -1)
                                         break;
                                     else
                                         category = 6;
@@ -166,14 +165,14 @@ int main()
                         token.text = "Identifier";
                         do
                         {
-                            token.lexem += s;
-                            s = f.get();
-                            ind = (int)s;
-                            if (ind >= 0)
+                            token.lexem += currentSymbol;
+                            currentSymbol = f.get();
+                            index = (int)currentSymbol;
+                            if (index >= 0)
                             {
-                                if (ind <= 127)
+                                if (index <= 127)
                                 {
-                                    category = attributes[ind];
+                                    category = attributes[index];
                                 }
                                 else
                                 {
@@ -182,7 +181,7 @@ int main()
                             }
                             else
                             {
-                                if (ind == -1)
+                                if (index == -1)
                                 {
                                     category = 0;
                                     break;
@@ -194,12 +193,13 @@ int main()
                             }
                             column++;
                         } while (category == 1 || category == 2);
+
                         if (category == 0 || category == 3 || category == 41 || category == 42 || category == 5)
                         {
-                            int isKeyword = IsKeyword(token.lexem);
-                            int isIdentifierInVector = SearchIdentifier(token.lexem);
-                            int isIdentifierInTable = SearchIdentifierTable(token.lexem);
-
+                            int isKeyword = SearchTableKeyword(token.lexem);
+                            int isIdentifierInTable = SearchTableIdentifier(token.lexem);
+                            int isIdentifierInVector = Identifier(token.lexem);
+                           
                             if (isKeyword != 1)
                             {
                                 token.id = isKeyword;
@@ -212,7 +212,7 @@ int main()
                             }
                             else if (isIdentifierInVector == 1)
                             {
-                                token.id = 1002 + IdentifierVector.size();
+                                token.id = 1003 + IdentifierVector.size();
                                 IdentifierVector.push_back(token.lexem);
                                 TokenVector.push_back(token);
                             }
@@ -225,14 +225,14 @@ int main()
                         {
                             do
                             {
-                                token.lexem += s;
-                                s = f.get();
-                                ind = (int)s;
-                                if (ind >= 0)
+                                token.lexem += currentSymbol;
+                                currentSymbol = f.get();
+                                index = (int)currentSymbol;
+                                if (index >= 0)
                                 {
-                                    if (ind <= 127)
+                                    if (index <= 127)
                                     {
-                                        category = attributes[ind];
+                                        category = attributes[index];
                                     }
                                     else
                                     {
@@ -241,7 +241,7 @@ int main()
                                 }
                                 else
                                 {
-                                    if (ind == -1)
+                                    if (index == -1)
                                     {
                                         break;
                                     }
@@ -262,8 +262,8 @@ int main()
                         token.line = line;
                         token.column = column;
                         token.text = "Delimiter1";
-                        token.lexem += s;
-                        token.id = ind;
+                        token.lexem += currentSymbol;
+                        token.id = index;
                         column++;
                         PrintInfo(token);
                         TokenVector.push_back(token);
@@ -272,23 +272,23 @@ int main()
                     case 42:
                         token.line = line;
                         token.column = column;
-                        token.lexem += s;
-                        s = f.get();
-                        ind = (int)s;
+                        token.lexem += currentSymbol;
+                        currentSymbol = f.get();
+                        index = (int)currentSymbol;
                         column++;
-                        category = attributes[ind];
+                        category = attributes[index];
 
                         if (category == 0 || category == 1 || category == 2 ) {
-                            token.id = 101;
-                            token.text = "Delimiter1";
+                            token.id = 301;
+                            token.text = "Delimiter2";
                             TokenVector.push_back(token);
                             PrintInfo(token);
                             f.unget();
                         }
                         else {
                             column++;
-                            token.lexem += s;
-                            int DelimetrTable = SearchDelimetrTable(token.lexem);
+                            token.lexem += currentSymbol;
+                            int DelimetrTable = SearchTableDelimiter(token.lexem);
                             if (DelimetrTable != 1) {
                                 if (DelimetrTable == 301)
                                 {
@@ -315,29 +315,28 @@ int main()
                     case 43:
                         token.line = line;
                         token.column = column;
-                        token.lexem += s;
-                        s = f.get();
-                        ind = (int)s;
+                        token.lexem += currentSymbol;
+                        currentSymbol = f.get();
+                        index = (int)currentSymbol;
                         column++;
-                        category = attributes[ind];
+                        category = attributes[index];
 
                         if (category == 0 || category == 1 || category == 2) {
-                            token.id = 102;
-                            token.text = "Delimiter1";
+                            token.id = 302;
+                            token.text = "Delimiter3";
                             TokenVector.push_back(token);
                             PrintInfo(token);
                             f.unget();
                         }
                         else {
                             column++;
-                            token.lexem += s;
-                            int DelimetrTable = SearchDelimetrTable(token.lexem);
+                            token.lexem += currentSymbol;
+                            int DelimetrTable = SearchTableDelimiter(token.lexem);
                             if (DelimetrTable != 1) {
                                 token.id = DelimetrTable;
-                                token.text = "Delimiter2";
+                                token.text = "Delimiter3";
                                 TokenVector.push_back(token);
                                 PrintInfo(token);
-
                             }
                             else {
                                 token.text = "invalid multi-character separator";
@@ -349,38 +348,38 @@ int main()
 
                     case 5:
 
-                        token.lexem += s;
-                        s = f.get();
-                        ind = (int)s;
-                        if (ind >= 0 && ind <= 127)
+                        token.lexem += currentSymbol;
+                        currentSymbol = f.get();
+                        index = (int)currentSymbol;
+                        if (index >= 0 && index <= 127)
                         {
-                            category = attributes[ind];
+                            category = attributes[index];
                         }
                         else
                         {
                             category = 6;
                         }
                         column++;
-                        if (s == '*')
+                        if (currentSymbol == '*')
                         {
                             token.line = line;
                             token.column = column - 1;
-                            token.lexem += s;
+                            token.lexem += currentSymbol;
                             bool isFindStar = false;
                             bool isEndComment = false;
 
-                            while (ind != -1)
+                            while (index != -1)
                             {
 
-                                s = f.get();
-                                ind = (int)s;
-                                token.lexem += s;
-                                if (s == '*')
+                                currentSymbol = f.get();
+                                index = (int)currentSymbol;
+                                token.lexem += currentSymbol;
+                                if (currentSymbol == '*')
                                 {
                                     isFindStar = true;
                                     column++;
                                 }
-                                else if (s == ')' && isFindStar)
+                                else if (currentSymbol == ')' && isFindStar)
                                 {
                                     isEndComment = true;
                                     column++;
@@ -389,12 +388,12 @@ int main()
                                 else
                                 {
                                     isFindStar = false;
-                                    if (s == '\n')
+                                    if (currentSymbol == '\n')
                                     {
                                         line++;
                                         column = 1;
                                     }
-                                    else if (s == '\t')
+                                    else if (currentSymbol == '\t')
                                     {
                                         column = column - (column - 1) % 4 + 4;
                                     }
@@ -438,16 +437,16 @@ int main()
                         token.text = "Error";
                         do
                         {
-                            token.lexem += s;
-                            s = f.get();
-                            ind = (int)s;
-                            if (ind >= 0 && ind <= 127)
+                            token.lexem += currentSymbol;
+                            currentSymbol = f.get();
+                            index = (int)currentSymbol;
+                            if (index >= 0 && index <= 127)
                             {
-                                category = attributes[ind];
+                                category = attributes[index];
                             }
                             else
                             {
-                                if (ind == -1)
+                                if (index == -1)
                                 {
                                     break;
                                 }
@@ -473,7 +472,7 @@ int main()
             }
             else
             {
-                if (ind == -1)
+                if (index == -1)
                 {
                     break;
                 }
@@ -499,20 +498,20 @@ int main()
     }
 }
 
-void PrintInfo(LexemInfo lexemInfo)
+void PrintInfo(Lexem lexem)
 {
-    std::cout << "|" << setw(6) << lexemInfo.line << "|" << setw(8) << lexemInfo.column << "|" << setw(10) << lexemInfo.id << "|" << setw(10) << lexemInfo.lexem << "|" << std::endl;
+    std::cout << "|" << setw(6) << lexem.line << "|" << setw(8) << lexem.column << "|" << setw(10) << lexem.id << "|" << setw(10) << lexem.lexem << "|" << std::endl;
 }
 
-void PrintError(LexemInfo errorInfo)
+void PrintError(Lexem Error)
 {
-    std::cout << "|" << setw(6) << errorInfo.line << "|" << setw(8) << errorInfo.column << "|Lexer error: |" << setw(45) << errorInfo.text << "|" << setw(10) << errorInfo.lexem << "|"  << std::endl;
+    std::cout << "|" << setw(6) << Error.line << "|" << setw(8) << Error.column << "|Lexer error: |" << setw(45) << Error.text << "|" << setw(10) << Error.lexem << "|"  << std::endl;
 }
 
-int IsKeyword(string keyword)
+int SearchTableKeyword(string Keyword)
 {
-    for (int i = 0; i < 6; i++)
-        if (Keywords[i] == keyword)
+    for (int i = 0; i < 7; i++)
+        if (tableKeywords[i] == Keyword)
             return 401 + i;
 
     return 1;
@@ -527,7 +526,7 @@ int SearchConst(string strConst)
     return 1;
 }
 
-int SearchIdentifierTable(string Identifiers)
+int SearchTableIdentifier(string Identifiers)
 {
     for (int i = 0; i < 2; i++)
         if (tableIdentifiers[i] == Identifiers)
@@ -536,20 +535,20 @@ int SearchIdentifierTable(string Identifiers)
     return 1;
 }
 
-int SearchIdentifier(string strIdentifier)
+int Identifier(string strIdentifier)
 {
     for (int i = 0; i < IdentifierVector.size(); i++)
         if (IdentifierVector[i] == strIdentifier)
-            return 1002 + i;
+            return 1003 + i;
 
     return 1;
 }
 
-int SearchDelimetrTable(string Delimetr)
+int SearchTableDelimiter(string Delimiter)
 {
-    for (int i = 0; i < 6; i++)
-        if (tableDelimetr[i] == Delimetr)
-            return 301 + i;
+    for (int i = 0; i < 3; i++)
+        if (tableDelimiter[i] == Delimiter)
+            return 303 + i;
 
     return 1;
 }

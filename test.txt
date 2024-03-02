@@ -1,6 +1,9 @@
-PROGRAM TEST2	(* QWEW *);
+PROGRAM TEST1;
 	BEGIN
-		 < <> > > ! # . @[]^ :=  
-		 VaR1 := 3
-		 (* asdasd
-	END.
+		VAR
+			WHILE
+				DO
+					 A1:INTEGER 10
+					 A3:FLOAT 8
+			ENDWHILE;
+END.
